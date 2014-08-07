@@ -11,14 +11,14 @@ def main():
         writer = csv.writer(video_2_user_file)
         writer.writerow(['Video ID', 'Username'])
 
-        for video in video_2_user_db.keys():
+        for video in sorted(video_2_user_db.keys()):
             writer.writerow([video.decode(), video_2_user_db[video].decode()])
 
     with open('video_2_server.csv', 'w', newline='') as video_2_server_file:
         writer = csv.writer(video_2_server_file)
         writer.writerow(['Video ID', 'Server Media URL'])
 
-        for video in video_2_server_db.keys():
+        for video in sorted(video_2_server_db.keys()):
             if video not in video_2_user_db:
                 print('Warning: ', video, 'not in database skipping.')
                 continue
