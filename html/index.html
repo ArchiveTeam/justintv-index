@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head><title>Archive Team Justin.tv video file archive search</title>
+
+<body>
+<noscript>This search feature requires JavaScript. Sorry!</noscript>
+
+<p>Welcome to the Archive Team Justin.tv video file archive search</p>
+<form onsubmit="return false;">
+<p>
+
+Enter the URL of the video page please: </p>
+<input id="search_box" type="url"
+	value="http://www.justin.tv/startuplessonslearned/b/286532804"
+	style="width:90%">
+	<button id="search_button">Search!</button>
+</form>
+
+<div id="msg" style="font-weight: bold"></div>
+
+<div id="results" style="display:none;">
+	<p>The media URL is <span id="media_url"></span>.</p>
+	<p>You can <a id="wayback_url">access it on the Wayback Machine</a>.
+</div>
+
+<p>This search only covers 40% of the videos archived by this project.</p>
+<p>If you are using Internet Explorer, please use version 9 or higher.</p>
+<p>Problems? Please <a href="https://github.com/ArchiveTeam/justintv-index/issues">file an issue</a></p>
+<p><a href="http://archiveteam.org/index.php?title=Justin.tv">About the project.</a></p>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+
+function search() {
+	var urlRegex = /justin\.tv\/([^\/]+)\/\w\/([\d]+)/g;
+	$("#search_button,#search_box").prop('disabled', true);
+	$("#results").hide();
+	
+	var url = $('#search_box').val();
+	var result = urlRegex.exec(url);
+	
+	if (!result) {
+		$("#msg").text("Sorry, this doesn't look like an expected justin.tv URL. Please retype it.");
+		$("#search_button,#search_box").prop('disabled', false);
+		return;
+	}
+	
+	var username = result[1];
+	var videoId = result[2];
+	
+	var filename = 'jsdata/data-' + videoId.slice(0, 2) + '.json';
+	
+	$("#msg").text("Searching...");
+	
+	$.getJSON(filename, function(data, textStatus, jqXHR) {
+		$("#search_button,#search_box").prop('disabled', false);
+		
+		if (textStatus != "success") {
+			$("#msg").text("Oops! Something went wrong during the search. Please try again.");
+			return;
+		}
+		var mediaUrl = data[videoId];
+		
+		if (mediaUrl === undefined) {
+			$("#msg").text("Sorry, this video doesn't seem to be archived as part of this project.");
+			return;
+		}
+		
+		if (mediaUrl === null) {
+			$("#msg").text("Sorry, this video has been downloaded, but the index isn't complete yet.");
+			return;
+		}
+		
+		$("#msg").text("");
+		
+		$("#results").show();
+		$("#media_url").text(mediaUrl);
+		$("#wayback_url").attr('href', 'https://web.archive.org/*/' + mediaUrl);
+	});
+}
+
+$('#search_button').click(search);
+</script>
+</body>
+</html>
