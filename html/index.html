@@ -52,13 +52,8 @@ function search() {
 	
 	$("#msg").text("Searching...");
 	
-	$.getJSON(filename, function(data, textStatus, jqXHR) {
-		$("#search_button,#search_box").prop('disabled', false);
-		
-		if (textStatus != "success") {
-			$("#msg").text("Oops! Something went wrong during the search. Please try again.");
-			return;
-		}
+	$.getJSON(filename)
+	.done(function(data) {
 		var mediaUrl = data[videoId];
 		
 		if (mediaUrl === undefined) {
@@ -76,6 +71,17 @@ function search() {
 		$("#results").show();
 		$("#media_url").text(mediaUrl);
 		$("#wayback_url").attr('href', 'https://web.archive.org/*/' + mediaUrl);
+	})
+	.fail(function(jqXHR) {
+		if (jqXHR.status == 404) {
+			$("#msg").text("Sorry, this video doesn't seem to be archived as part of this project.");
+		} else {
+			$("#msg").text("Oops! Something went wrong during the search. Please try again.");
+		}
+		return;
+	})
+	.always(function() {
+		$("#search_button,#search_box").prop('disabled', false);
 	});
 }
 
